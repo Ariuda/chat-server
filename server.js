@@ -39,13 +39,21 @@ const users = [
       password: 'test2',
       id: 8,
       theme: 'dark',
-      beFound: true
+      beFound: false
     },
     {
       username: 'test3',
       email: 'test3@test.com',
       password: 'test3',
       id: 10,
+      theme: 'sleek',
+      beFound: true
+    },
+    {
+      username: 'test4',
+      email: 'test4@test.com',
+      password: 'test4',
+      id: 19,
       theme: 'sleek',
       beFound: true
     }
@@ -193,6 +201,21 @@ app.get('/:uid/chat/:chatId', (req, res) => {
   }
 });
 
+// add chat - post /:uid/new-chat
+app.post('/:uid/new-chat/:toUid', (req, res) => {
+  const { uid, toUid } = req.params;
+  const { username } = users.find(user => user.id === parseInt(toUid, 10));
+  let newChat = {
+    chatId: Math.floor(Math.random() * 1000),
+      users: [ parseInt(uid, 10), parseInt(toUid, 10)],
+      to: username,
+      messages: []
+  };
+  chats.push(newChat);
+  res.json(newChat);
+
+}); 
+
 // add message - post /:uid/chat/:chatId
 app.post('/:uid/chat/:chatId', (req, res) => {
   const { uid, chatId } = req.params;
@@ -233,6 +256,21 @@ app.post('/:uid/chat/:chatId', (req, res) => {
 });*/
 
 // get users - get /:uid/users
+app.get('/:users/:search', (req, res) => {
+    const { search } = req.params;
+    let results = [];
+    users.forEach(user => {
+      if (user.username.toLowerCase().indexOf(search.toLowerCase()) > -1 && user.beFound) {
+        results.push({ user: user.username, id: user.id });
+      }
+    });
+
+    if (results.length > 0) {
+      res.json(results);
+  } else {
+      res.status(404).json('we couldn\'t find any users');
+  }
+});
 
 // add chat - post /:uid
 
